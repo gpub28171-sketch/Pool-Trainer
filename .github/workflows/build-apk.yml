@@ -1,6 +1,5 @@
 
 name: Build Shichak APK
-
 on:
   workflow_dispatch:
   push:
@@ -12,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Shichak Android APK
+    name: Build Android APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -31,22 +30,29 @@ jobs:
         with:
           packages: ''
 
-      - name: Install required Android SDK
+      - name: Install Android SDK
         run: |
           sdkmanager --install \
             "platform-tools" \
             "platforms;android-36.1" \
             "build-tools;36.1.0"
 
-      - name: Verify SDK
+      - name: Verify Android SDK
         run: |
           java -version
           sdkmanager --list_installed
 
+      - name: Set up Gradle 9.4.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.4.1'
+
+      - name: Verify Gradle
+        run: gradle --version
+
       - name: Build Debug APK
         run: |
-          chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
